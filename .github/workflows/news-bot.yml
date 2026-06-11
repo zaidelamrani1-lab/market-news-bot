@@ -4,7 +4,7 @@ on:
   schedule:
     # Every 15 minutes. Keeps AI usage well within free limits.
     # Runs can be delayed a few minutes at busy times — normal for free jobs.
-    - cron: "*/15 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch: {}
 
 permissions:
