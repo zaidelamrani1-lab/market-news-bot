@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0   # full history so the rebase-before-push works reliably
 
       - name: Set up Python
         uses: actions/setup-python@v6
