@@ -2,8 +2,6 @@ name: Market News Bot
 
 on:
   schedule:
-    # Every 5 minutes (GitHub's fastest free option).
-    # Runs can be delayed a few minutes at busy times — normal for free jobs.
     - cron: "*/5 * * * *"
   workflow_dispatch: {}
 
@@ -21,7 +19,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0   # full history so the rebase-before-push works reliably
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -36,13 +34,10 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
-          # Optional overrides (uncomment in your repo if you change provider/model):
-          # AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
-          # AI_MODEL: ${{ secrets.AI_MODEL }}
         run: python bot.py
 
       - name: Save which articles were processed
-        continue-on-error: true   # never fail the run over bookkeeping
+        continue-on-error: true
         run: |
           if [ -n "$(git status --porcelain seen.json)" ]; then
             git config user.name "market-news-bot"
