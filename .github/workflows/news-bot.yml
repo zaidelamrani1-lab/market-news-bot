@@ -2,7 +2,7 @@ name: Market News Bot
 
 on:
   schedule:
-    # Every 15 minutes. Keeps AI usage well within free limits.
+    # Every 5 minutes (GitHub's fastest free option).
     # Runs can be delayed a few minutes at busy times — normal for free jobs.
     - cron: "*/5 * * * *"
   workflow_dispatch: {}
@@ -40,13 +40,20 @@ jobs:
         run: python bot.py
 
       - name: Save which articles were processed
+        continue-on-error: true   # never fail the run over bookkeeping
         run: |
           if [ -n "$(git status --porcelain seen.json)" ]; then
             git config user.name "market-news-bot"
             git config user.email "market-news-bot@users.noreply.github.com"
             git add seen.json
             git commit -m "Update seen articles [skip ci]"
-            git push
+            for i in 1 2 3 4 5; do
+              git pull --rebase -X ours origin "${GITHUB_REF_NAME}" || git rebase --abort || true
+              if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+                echo "pushed"; break
+              fi
+              echo "push rejected, retrying..."; sleep 3
+            done
           else
             echo "No changes to seen.json"
           fi
